@@ -42,14 +42,29 @@ char* convert_string_upper(char* string, int length)
   return string;
 }
 
+char escape_chars[] = {'\0', '\n'};
+
 int character_string_length(char* string)
 {
   int length = 0;
-  while(string_index_character(string, length) != '\0')
+  while(!character_inside_string(string[length], escape_chars, 3))
   {
     length = (length + 1);
   }
   return length;
+}
+
+int character_inside_string(char character, char* string, int length)
+{
+  for(int index = 0; index < length; index = index + 1)
+  {
+    char current = string_index_character(string, index);
+    if(character_variables_equal(character, current))
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 int sentence_string_length(char** sentence, int index)
@@ -114,4 +129,36 @@ int string_inside_sentence(char* string, int length, char** sentence, int height
     }
   }
   return false;
+}
+
+char** allocate_sentence_string(char** sentence, int index, char* string)
+{
+  *(sentence + index) = string; return sentence;
+}
+
+char** generate_string_sentence(int height, int width)
+{
+  char** sentence = malloc(sizeof(char**) * height);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    char* string = generate_character_string(width);
+    sentence = allocate_sentence_string(sentence, index, string);
+  }
+  return sentence;
+}
+
+char*** allocate_matrix_sentence(char*** matrix, int index, char** sentence)
+{
+  *(matrix + index) = sentence; return matrix;
+}
+
+char*** generate_string_matrix(int height, int width)
+{
+  char*** matrix = malloc(sizeof(char**) * height);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    char** sentence = generate_string_sentence(width, 200);
+    matrix = allocate_matrix_sentence(matrix, index, sentence);
+  }
+  return matrix;
 }
