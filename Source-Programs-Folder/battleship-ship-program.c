@@ -7,7 +7,7 @@ int*** generate_battleship_array(int amount)
   int*** battleships = malloc(sizeof(int**) * (amount + 1));
   for(int index = 0; index < (amount + 1); index = index + 1)
   {
-    int** battleship = generate_battleship_object(2 + 1);
+    int** battleship = generate_coordinate_objects(2);
     battleships = allocate_battleships_ship(battleships, index, battleship);
   }
   return battleships;
@@ -25,16 +25,18 @@ int* allocate_coordinate_values(int* coordinate, int first, int second)
   return coordinate;
 }
 
-int** generate_battleship_object(int amount)
+int** generate_battleship_object(int* first, int* second)
 {
-  int** battleship = generate_coordinate_objects(amount);
+  int** battleship = generate_coordinate_objects(2);
+  battleship = allocate_array_coordinate(battleship, 0, first);
+  battleship = allocate_array_coordinate(battleship, 1, second);
   return battleship;
 }
 
 int** generate_coordinate_objects(int amount)
 {
-  int** coordinates = malloc(sizeof(int*) * amount);
-  for(int index = 0; index < amount; index = index + 1)
+  int** coordinates = malloc(sizeof(int*) * (amount + 1));
+  for(int index = 0; index < (amount + 1); index = index + 1)
   {
     int* coordinate = generate_coordinate_object(-1, -1);
     coordinates = allocate_array_coordinate(coordinates, index, coordinate);
@@ -44,7 +46,7 @@ int** generate_coordinate_objects(int amount)
 
 int* generate_coordinate_object(int first, int second)
 {
-  int* coordinate = malloc(sizeof(int) * 2);
+  int* coordinate = malloc(sizeof(int) * 3);
   coordinate = allocate_coordinate_values(coordinate, first, second);
   return coordinate;
 }
@@ -120,7 +122,7 @@ int inputted_coordinates_valid(int** coordinates, int*** battleships, int size)
 
   int size_valid = battleship_valid_size(coordinates, size);
   if(size_valid == false) return false;
-  
+
   int ship_valid = battleship_position_valid(battleships, coordinates);
   if(ship_valid == false) return false;
 
@@ -232,9 +234,50 @@ int coordinate_objects_equal(int* first, int* second)
   return true;
 }
 
-int generate_random_battleship(int*** battleships, int index, int size)
+int generate_random_integer(int minimum, int maximum)
 {
+  int integer = (minimum + (rand() % (maximum - minimum + 1)) );
+  return integer;
+}
 
+int** generate_random_battleship(int*** battleships, int ship_size)
+{
+  int** battleship = random_horizontal_battleship(ship_size);
+  if(generate_random_integer(0, 1) == 1) // slingra slant
+  {
+    battleship = random_vertical_battleship(ship_size);
+  }
+  if(battleship_position_valid(battleships, battleship))
+  {
+    return battleship;
+  }
+  return generate_random_battleship(battleships, ship_size);
+}
+
+int** random_vertical_battleship(int ship_size)
+{
+  int height_range = (10 - ship_size - 1);
+
+  int height = generate_random_integer(0, height_range);
+  int width = generate_random_integer(0, 10 - 1);
+
+  int* first = generate_coordinate_object(height, width);
+  int* second = generate_coordinate_object(height + ship_size - 1, width);
+
+  return generate_battleship_object(first, second);
+}
+
+int** random_horizontal_battleship(int ship_size)
+{
+  int width_range = (10 - ship_size - 1);
+
+  int height = generate_random_integer(0, 10 - 1);
+  int width = generate_random_integer(0, width_range);
+
+  int* first = generate_coordinate_object(height, width);
+  int* second = generate_coordinate_object(height, width + ship_size - 1);
+
+  return generate_battleship_object(first, second);
 }
 
 int** every_battleship_coordinate(int** battleship)
@@ -276,6 +319,46 @@ int convert_string_coordinates(char* string, int length, int** coordinates)
 }
 
 char alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', '\0'};
+char markers[5][2][200] = {{"BATTLESHIP\0", "#"}, {"MISS\0", "+"}, {"HIT\0", "X"}, {"SUNKEN\0", "$"}, {"EMPTY\0", "."}};
+
+char numbers[] = "  1 2 3 4 5 6 7 8 9 10";
+
+void display_board_width(char*** board, int width, int height)
+{
+  printf("%c ", string_index_character(alphabet, height));
+  for(int index = 0; index < width; index = index + 1)
+  {
+    char* keyword = board[height][index];
+    int mark_index = markers_keyword_index(markers, 5, keyword);
+
+    char marker = markers[mark_index][1][0];
+    printf("%c ", marker);
+  }
+}
+
+void display_battleship_boards(char*** first, char*** second, int height, int width)
+{
+  printf("%s\t%s\n", numbers, numbers);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    display_board_width(first, width, index);
+    printf("\t");
+    display_board_width(second, width, index);
+    printf("\n");
+  }
+  printf("\n");
+}
+
+void display_battleship_board(char*** board, int height, int width)
+{
+  printf("%s\n", numbers);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    display_board_width(board, width, index);
+    printf("\n");
+  }
+  printf("\n");
+}
 
 int convert_string_coordinate(char* string, int length, int* coordinate)
 {

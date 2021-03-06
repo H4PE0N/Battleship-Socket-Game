@@ -1,5 +1,6 @@
 
 #include "battleship-string-program.h"
+#include "battleship-ship-program.h"
 
 char string_index_character(char* string, int index)
 {
@@ -202,4 +203,51 @@ int split_character_string(char* string, int length, char character, char** spli
   split_string = allocate_sentence_string(split_string, 0, first);
   split_string = allocate_sentence_string(split_string, 1, second);
   return true;
+}
+
+int markers_keyword_index(char markers[][2][200], int amount, char* keyword)
+{
+  int length = character_string_length(keyword);
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    char* current = markers[index][0];
+    if(character_strings_equal(current, keyword, length))
+    {
+      return index;
+    }
+  }
+  return -1;
+}
+
+char*** board_coordinate_keyword(char*** board, int* coordinate, char* keyword)
+{
+  int h_index = coordinate_index_value(coordinate, 0);
+  int w_index = coordinate_index_value(coordinate, 1);
+  board[h_index][w_index] = keyword;
+  return board;
+}
+
+char*** board_coordinates_keyword(char*** board, int** coordinates, char* keyword)
+{
+  int amount = coordinates_array_amount(coordinates);
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    int* coordinate = array_index_coordinate(coordinates, index);
+    board = board_coordinate_keyword(board, coordinate, keyword);
+  }
+  return board;
+}
+
+char*** generate_battleship_board(int height, int width)
+{
+  char*** board = malloc(sizeof(char**) * height);
+  for(int h_index = 0; h_index < height; h_index += 1)
+  {
+    board[h_index] = malloc(sizeof(char*) * width);
+    for(int w_index = 0; w_index < width; w_index += 1)
+    {
+      board[h_index][w_index] = "EMPTY";
+    }
+  }
+  return board;
 }

@@ -19,11 +19,12 @@ int main(int arg_amount, char* arguments[])
 
   int socket_obj = setup_socket_information(socket_role);
 
-  char*** def_board = generate_string_matrix(BOARD_HEIGHT, BOARD_WIDTH);
-  char*** off_board = generate_string_matrix(BOARD_HEIGHT, BOARD_WIDTH);
+  char*** def_board = generate_battleship_board(BOARD_HEIGHT, BOARD_WIDTH);
+  char*** off_board = generate_battleship_board(BOARD_HEIGHT, BOARD_WIDTH);
+  int*** battleships = generate_board_battleships(def_board, 5);
+  // char*** def_board = generate_battleship_board(BOARD_HEIGHT, BOARD_WIDTH);
+  // char*** off_board = generate_battleship_board(BOARD_HEIGHT, BOARD_WIDTH);
   char* game_result = generate_character_string(200);
-
-  int setup_output = setup_game_information(def_board, off_board, game_result);
 
   if(character_strings_equal(socket_role, "SERVER", 6))
   {
@@ -34,7 +35,7 @@ int main(int arg_amount, char* arguments[])
     int game_output = client_battleship_game(socket_obj, def_board, off_board, game_result);
   }
 
-  int disp_output = display_game_result(def_board, off_board, game_result);
+  display_game_result(def_board, off_board, game_result);
 
   return false;
 }
@@ -106,30 +107,33 @@ int setup_client_socket(char* address, int port)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-int setup_game_information(char*** def_board, char*** off_board, char* game_result)
+int*** generate_board_battleships(char*** def_board, int amount)
 {
-  int*** battleships = generate_battleship_array(5);
-  battleships = input_battleship_positions(battleships, 5);
+  int*** battleships = generate_battleship_array(amount);
+  battleships = input_battleship_positions(battleships, def_board);
+  return battleships;
 }
 
-int*** input_battleship_positions(int*** battleships, int amount)
+int*** input_battleship_positions(int*** battleships, char*** def_board)
 {
-  for(int index = 0; index < amount; index = index + 1)
+  for(int index = 0; index < 5; index = index + 1)
   {
-    int** battleship = input_battleship_position(battleships, index);
-    printf("BATTLESHP=([%d,%d] - [%d,%d])\n", battleship[0][0], battleship[0][1], battleship[1][0], battleship[1][1]);
-    battleships = allocate_battleships_ship(battleships, index, battleship);
+    display_battleship_board(def_board, 10, 10);
+    battleships = input_battleship_position(battleships, index);
+
+    int** battleship = battleships_index_ship(battleships, index);
+    int** all_cords = every_battleship_coordinate(battleship);
+    def_board = board_coordinates_keyword(def_board, all_cords, "BATTLESHIP\0");
   }
   return battleships;
 }
 
 int ship_sizes[] = {2, 3, 3, 4, 5};
 
-int** input_battleship_position(int*** battleships, int index)
+int*** input_battleship_position(int*** battleships, int index)
 {
   int size = ship_sizes[index];
   char* input_string = generate_character_string(200);
-  int ship_output = false;
 
   printf("INPUT BATTLESHIP #%d [SIZE: %d]: ", index + 1, size);
   scanf("%[^\n]s", input_string); getchar();
@@ -144,35 +148,33 @@ int** input_battleship_position(int*** battleships, int index)
 
   if(character_strings_equal(input_string, "RANDOM", 6))
   {
-    ship_output = generate_random_battleship(battleships, size, index);
+    int** battleship = generate_random_battleship(battleships, size);
+    battleships = allocate_battleships_ship(battleships, index, battleship);
   }
-  else
+  else if(!generate_inputted_battleship(battleships, index, size, input_string))
   {
-    ship_output = generate_inputted_battleship(battleships, index, size, input_string);
+      return input_battleship_position(battleships, index);
   }
-
-  if(ship_output == false)
-  {
-    return input_battleship_position(battleships, index);
-  }
-  return battleships_index_ship(battleships, index);
+  return battleships;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
 int server_battleship_game(int socket_obj, char*** def_board, char*** off_board, char* game_result)
 {
+  display_battleship_boards(def_board, off_board, 10, 10);
   return true;
 }
 
 int client_battleship_game(int socket_obj, char*** def_board, char*** off_board, char* game_result)
 {
+  display_battleship_boards(def_board, off_board, 10, 10);
   return true;
 }
 
-int display_game_result(char*** def_board, char*** off_board, char* game_result)
+void display_game_result(char*** def_board, char*** off_board, char* game_result)
 {
-  return true;
+
 }
 
 char* socket_roles[] = {"SERVER", "CLIENT", "\0"};

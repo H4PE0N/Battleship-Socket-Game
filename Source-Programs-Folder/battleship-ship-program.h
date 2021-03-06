@@ -9,8 +9,11 @@
 int*** generate_battleship_array(int);
 int*** allocate_battleships_ship(int***, int, int**);
 
-int** generate_battleship_object(int);
+int** generate_battleship_object(int*, int*);
 int** allocate_array_coordinate(int**, int, int*);
+
+int** random_vertical_battleship(int);
+int** random_horizontal_battleship(int);
 
 int* generate_coordinate_object(int, int);
 int** generate_coordinate_objects(int);
@@ -18,8 +21,10 @@ int** generate_coordinate_objects(int);
 int coordinate_index_value(int*, int);
 int** battleships_index_ship(int***, int);
 
+int generate_random_integer(int, int);
+
 int generate_inputted_battleship(int***, int, int, char*);
-int generate_random_battleship(int***, int, int);
+int** generate_random_battleship(int***, int);
 
 int convert_string_coordinate(char*, int, int*);
 int convert_string_coordinates(char*, int, int**);
@@ -33,7 +38,7 @@ int battleship_position_valid(int***, int**);
 int inputted_coordinates_valid(int**, int***, int);
 int* array_index_coordinate(int**, int);
 
-int battleship_coordinates_amount(int**);
+int coordinates_array_amount(int**);
 int coordinate_variable_exsist(int*);
 
 int battleship_over_battleship(int**, int**);
@@ -47,5 +52,9 @@ int** every_battleship_coordinate(int**);
 
 int coordinate_inside_array(int*, int**, int);
 int coordinate_objects_equal(int*, int*);
+
+void display_battleship_board(char***, int, int);
+void display_battleship_boards(char***, char***, int, int);
+void display_board_width(char***, int, int);
 
 #endif
