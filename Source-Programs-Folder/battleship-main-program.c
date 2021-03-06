@@ -47,6 +47,8 @@ int setup_socket_information(char* socket_role)
   int socket_obj;
   int output = input_socket_information(address, &port);
 
+  printf("ADDRESS: (%s) PORT: (%d)\n", address, port);
+
   if(character_strings_equal(socket_role, "SERVER", 6))
   {
     int socket_obj = setup_server_socket(address, port);
@@ -61,14 +63,18 @@ int setup_socket_information(char* socket_role)
 
 int input_socket_information(char* address, int* port)
 {
-  printf("ADDRESS\t:"); scanf("%s", address);
-  printf("PORT\t: "); int port_valid=scanf("%d", port);
+  // printf("ADDRESS\t:"); scanf("%s", address);
+  // printf("PORT\t: "); int port_valid=scanf("%d", port);
+  //
+  // int length = character_string_length(address);
+  // int addr_valid = socket_address_valid(address, length);
+  //
+  // if(addr_valid && port_valid) return true;
+  // exit_and_print_message("ADDRESS OR PORT NOT INPUTTED");
 
-  int length = character_string_length(address);
-  int addr_valid = socket_address_valid(address, length);
-
-  if(addr_valid && port_valid) return true;
-  exit_and_print_message("ADDRESS OR PORT NOT INPUTTED");
+  strcpy(address, "192.168.1.113");
+  *port = 5555;
+  return true;
 }
 
 int setup_server_socket(char* address, int port)
@@ -103,7 +109,56 @@ int setup_client_socket(char* address, int port)
 int setup_game_information(char*** def_board, char*** off_board, char* game_result)
 {
   int*** battleships = generate_battleship_array(5);
+  battleships = input_battleship_positions(battleships, 5);
 }
+
+int*** input_battleship_positions(int*** battleships, int amount)
+{
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    int** battleship = input_battleship_position(battleships, index);
+    printf("BATTLESHP=([%d,%d] - [%d,%d])\n", battleship[0][0], battleship[0][1], battleship[1][0], battleship[1][1]);
+    battleships = allocate_battleships_ship(battleships, index, battleship);
+  }
+  return battleships;
+}
+
+int ship_sizes[] = {2, 3, 3, 4, 5};
+
+int** input_battleship_position(int*** battleships, int index)
+{
+  int size = ship_sizes[index];
+  char* input_string = generate_character_string(200);
+  int ship_output = false;
+
+  printf("INPUT BATTLESHIP #%d [SIZE: %d]: ", index + 1, size);
+  scanf("%[^\n]s", input_string); getchar();
+
+  int length = character_string_length(input_string);
+  input_string = convert_string_upper(input_string, length);
+
+  if(character_strings_equal(input_string, "EXIT", 4))
+  {
+    exit_and_print_message("QUITING GAME / SHIP INPUT");
+  }
+
+  if(character_strings_equal(input_string, "RANDOM", 6))
+  {
+    ship_output = generate_random_battleship(battleships, size, index);
+  }
+  else
+  {
+    ship_output = generate_inputted_battleship(battleships, index, size, input_string);
+  }
+
+  if(ship_output == false)
+  {
+    return input_battleship_position(battleships, index);
+  }
+  return battleships_index_ship(battleships, index);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
 
 int server_battleship_game(int socket_obj, char*** def_board, char*** off_board, char* game_result)
 {

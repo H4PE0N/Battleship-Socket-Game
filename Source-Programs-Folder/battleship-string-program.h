@@ -33,6 +33,9 @@ char*** allocate_matrix_sentence(char***, int, char**);
 char** allocate_sentence_string(char**, int, char*);
 
 int character_inside_string(char, char*, int);
+int string_character_index(char*, int, char);
 
+int split_character_string(char*, int, char, char**);
+char* character_string_section(char*, int, int);
 
 #endif

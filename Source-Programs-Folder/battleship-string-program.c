@@ -162,3 +162,44 @@ char*** generate_string_matrix(int height, int width)
   }
   return matrix;
 }
+
+int string_character_index(char* string, int length, char character)
+{
+  for(int index = 0; index < length; index = index + 1)
+  {
+    char current = string_index_character(string, index);
+    if(character_variables_equal(current, character))
+    {
+      return index;
+    }
+  }
+  return -1;
+}
+
+char* character_string_section(char* string, int first, int second)
+{
+  int length = (second - first + 1);
+  char* section = generate_character_string(length);
+  for(int index = 0; index < length; index = index + 1)
+  {
+    int curr_index = (index + first);
+    char character = string_index_character(string, curr_index);
+    section = allocate_string_character(section, index, character);
+  }
+  return section;
+}
+
+int split_character_string(char* string, int length, char character, char** split_string)
+{
+  if(length <= 2) return false;
+
+  int index = string_character_index(string, length, character);
+  if(index == -1) return false;
+
+  char* first = character_string_section(string, 0, index - 1);
+  char* second = character_string_section(string, index + 1, length - 1);
+
+  split_string = allocate_sentence_string(split_string, 0, first);
+  split_string = allocate_sentence_string(split_string, 1, second);
+  return true;
+}
