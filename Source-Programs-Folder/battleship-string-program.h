@@ -44,4 +44,6 @@ char*** generate_battleship_board(int, int);
 char*** board_coordinates_keyword(char***, int**, char*);
 char*** board_coordinate_keyword(char***, int*, char*);
 
+int convert_coordinate_string(int*, char*);
+
 #endif

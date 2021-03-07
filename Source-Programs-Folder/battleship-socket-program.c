@@ -1,6 +1,9 @@
 
-#include "battleship-socket-program.h"
+#include "battleship-main-program.h"
+#include "battleship-string-program.h"
 #include "battleship-output-program.h"
+#include "battleship-socket-program.h"
+#include "battleship-ship-program.h"
 
 int listen_for_connection(int server_socket, int backlog)
 {

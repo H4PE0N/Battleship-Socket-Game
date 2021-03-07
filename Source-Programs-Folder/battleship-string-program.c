@@ -1,5 +1,8 @@
 
+#include "battleship-main-program.h"
 #include "battleship-string-program.h"
+#include "battleship-output-program.h"
+#include "battleship-socket-program.h"
 #include "battleship-ship-program.h"
 
 char string_index_character(char* string, int index)
@@ -250,4 +253,95 @@ char*** generate_battleship_board(int height, int width)
     }
   }
   return board;
+}
+
+int convert_string_coordinates(char* string, int length, int** coordinates)
+{
+  char** split_string = generate_string_sentence(length, length);
+  int split_output = split_character_string(string, length, ' ', split_string);
+  if(split_output == false) return false;
+
+  for(int index = 0; index < 2; index = index + 1)
+  {
+    char* curr_str = sentence_index_string(split_string, index);
+    int string_len = character_string_length(curr_str);
+
+    int cord_output = convert_string_coordinate(curr_str, string_len, coordinates[index]);
+    if(cord_output == false) return false;
+
+    coordinates = allocate_array_coordinate(coordinates, index, coordinates[index]);
+  }
+  return true;
+}
+
+char alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', '\0'};
+char markers[5][2][200] = {{"BATTLESHIP\0", "#"}, {"MISS\0", "+"}, {"HIT\0", "X"}, {"SUNKEN\0", "$"}, {"EMPTY\0", "."}};
+
+char numbers[] = "  1 2 3 4 5 6 7 8 9 10";
+
+void display_board_width(char*** board, int width, int height)
+{
+  printf("%c ", string_index_character(alphabet, height));
+  for(int index = 0; index < width; index = index + 1)
+  {
+    char* keyword = board[height][index];
+    int mark_index = markers_keyword_index(markers, 5, keyword);
+
+    char marker = markers[mark_index][1][0];
+    printf("%c ", marker);
+  }
+}
+
+void display_battleship_boards(char*** first, char*** second, int height, int width)
+{
+  printf("%s\t%s\n", numbers, numbers);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    display_board_width(first, width, index);
+    printf("\t");
+    display_board_width(second, width, index);
+    printf("\n");
+  }
+  printf("\n");
+}
+
+void display_battleship_board(char*** board, int height, int width)
+{
+  printf("%s\n", numbers);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    display_board_width(board, width, index);
+    printf("\n");
+  }
+  printf("\n");
+}
+
+int convert_string_coordinate(char* string, int length, int* coordinate)
+{
+  char letter = string_index_character(string, 0);
+  int number = atoi(character_string_section(string, 1, length - 1));
+
+  int index = string_character_index(alphabet, 10, letter);
+  if(index == -1) return false;
+
+  coordinate[0] = index;
+  coordinate[1] = number;
+  return true;
+}
+
+int convert_coordinate_string(int* coordinate, char* string)
+{
+  int first = coordinate_index_value(coordinate, 0);
+  int second = coordinate_index_value(coordinate, 1);
+
+  int length = character_string_length(alphabet);
+  if(first < 0 || first >= length) return false;
+
+  char letter = string_index_character(alphabet, first);
+  char number = (second + '0');
+
+  string = allocate_string_character(string, 0, letter);
+  string = allocate_string_character(string, 1, number);
+
+  return true;
 }

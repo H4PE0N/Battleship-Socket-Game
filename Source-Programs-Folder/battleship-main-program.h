@@ -18,12 +18,26 @@ int input_socket_information(char*, int*);
 int setup_server_socket(char*, int);
 int setup_client_socket(char*, int);
 
-int server_battleship_game(int, char***, char***, char*);
-int client_battleship_game(int, char***, char***, char*);
+char* server_battleship_game(int, char***, char***, int***);
+char* client_battleship_game(int, char***, char***, int***);
 
 void display_game_result(char***, char***, char*);
 
 int*** input_battleship_positions(int***, char***);
 int*** input_battleship_position(int***, int);
+
+int attack_opponent_coordinate(int, char***, char*);
+int register_opponents_damage(int, char***, int***, char*);
+
+int receive_opponents_coordinate(int, int*);
+int send_registerd_protocol(int, char*, int**);
+
+char*** register_opponents_coordinate(int*, char***, int***, char*, int**);
+
+int receive_opponents_protocol(int, char*, int**);
+int send_attacking_coordinate(int, int*);
+char*** register_protocol_coordinates(char*, int**, char***);
+
+int* input_attacking_coordinate();
 
 #endif
