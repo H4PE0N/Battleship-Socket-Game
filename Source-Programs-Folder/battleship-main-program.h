@@ -30,7 +30,7 @@ int attack_opponent_coordinate(int, char***, char*);
 int register_opponents_damage(int, char***, int***, char*);
 
 int receive_opponents_coordinate(int, int*);
-int send_registerd_protocol(int, char*, int**);
+int send_registerd_damage(int, char*, int**);
 
 char*** register_opponents_coordinate(int*, char***, int***, char*, int**);
 
@@ -39,5 +39,11 @@ int send_attacking_coordinate(int, int*);
 char*** register_protocol_coordinates(char*, int**, char***);
 
 int* input_attacking_coordinate();
+int generate_damage_protocol(char*, int**, char*);
 
+int allocate_coordinate_protocol(int*, char*);
+
+int defence_board_defeated(char***, int***, int*);
+int defence_ship_defeated(int**, char***, int*);
+int coordinate_hit_battleship(int*, int**);
 #endif

@@ -120,7 +120,7 @@ int*** input_battleship_positions(int*** battleships, char*** def_board)
 
     int** battleship = battleships_index_ship(battleships, index);
     int** all_cords = every_battleship_coordinate(battleship);
-    def_board = board_coordinates_keyword(def_board, all_cords, "BATTLESHIP\0");
+    def_board = set_coordinates_keyword(def_board, all_cords, "BATTLESHIP\0");
   }
   return battleships;
 }
@@ -161,10 +161,10 @@ char* server_battleship_game(int socket_obj, char*** def_board, char*** off_boar
 {
   printf("THE SERVER GAME START!\n");
   char* game_result = generate_character_string(200);
-  while(!character_strings_equal(game_result, "WON", 3) || !character_strings_equal(game_result, "DEFEATED", 8))
+  while(!character_strings_equal(game_result, "WON\0", 3) && !character_strings_equal(game_result, "DEFEATED\0", 8))
   {
     display_battleship_boards(def_board, off_board, 10, 10);
-    if(attack_opponent_coordinate(socket_obj, off_board, game_result))
+    if(!attack_opponent_coordinate(socket_obj, off_board, game_result))
     {
       break;
     }
@@ -178,10 +178,10 @@ char* client_battleship_game(int socket_obj, char*** def_board, char*** off_boar
 {
   printf("THE CLIENT GAME START!\n");
   char* game_result = generate_character_string(200);
-  while(!character_strings_equal(game_result, "WON", 3) || !character_strings_equal(game_result, "DEFEATED", 8))
+  while(!character_strings_equal(game_result, "WON\0", 3) && !character_strings_equal(game_result, "DEFEATED\0", 8))
   {
     display_battleship_boards(def_board, off_board, 10, 10);
-    if(register_opponents_damage(socket_obj, def_board, battleships, game_result))
+    if(!register_opponents_damage(socket_obj, def_board, battleships, game_result))
     {
       break;
     }
@@ -193,68 +193,70 @@ char* client_battleship_game(int socket_obj, char*** def_board, char*** off_boar
 
 int attack_opponent_coordinate(int socket_obj, char*** off_board, char* game_result)
 {
+  //printf("attack_opponent_coordinate\n");
   int* coordinate = input_attacking_coordinate();
   int send_output = send_attacking_coordinate(socket_obj, coordinate);
   if(send_output == false)
   {
-    game_result = "WON";
-    return true;
+    strcpy(game_result, "WON");
+    return false;
+  }
+  char* action = generate_character_string(200);
+  int** coordinates = generate_coordinate_objects(5);
+  int recv_output = receive_opponents_protocol(socket_obj, action, coordinates);
+
+  if(character_strings_equal(action, "DEFEATED", 8))
+  {
+    strcpy(game_result, "WON");
+    return false;
   }
 
-  printf("(%d,%d)\n", coordinate[0], coordinate[1]);
-  // char* action = generate_character_string(200);
-  // int** coordinates = generate_coordinate_objects(2);
-  // int recv_output = receive_opponents_protocol(socket_obj, action, coordinates);
-  // if(character_strings_equal(action, "DEFEATED", 8))
-  // {
-  //   game_result = "WON";
-  //   return true;
-  // }
-  //
-  // if(recv_output == false)
-  // {
-  //   game_result = "WON";
-  //   return true;
-  // }
-  // off_board = register_protocol_coordinates(action, coordinates, off_board);
+  if(recv_output == false)
+  {
+    strcpy(game_result, "WON");
+    return false;
+  }
+  off_board = register_protocol_coordinates(action, coordinates, off_board);
 
-  return false;
+  return true;
 }
 
 int register_opponents_damage(int socket_obj, char*** def_board, int*** battleships, char* game_result)
 {
+  //printf("register_opponents_damage\n");
   int* coordinate = generate_coordinate_object(-1, -1);
   int recv_output = receive_opponents_coordinate(socket_obj, coordinate);
   if(recv_output == false)
   {
-    game_result = "WON";
-    return true;
+    strcpy(game_result, "WON");
+    return false;
   }
-  printf("(%d,%d)\n", coordinate[0], coordinate[1]);
 
-  // char* action = generate_character_string(200);
-  // int** coordinates = generate_coordinate_objects(2);
-  //
-  // int regg_output = register_opponents_coordinate(coordinate, def_board, battleships, action, coordinates);
-  // if(character_strings_equal(action, "DEFEATED", 8))
-  // {
-  //   game_result = "DEFEATED";
-  //   return true;
-  // }
-  //
-  // int send_output = send_registerd_damage(socket_obj, action, coordinates);
-  // if(send_output == false)
-  // {
-  //   game_result = "WON";
-  //   return true;
-  // }
+  char* action = generate_character_string(200);
+  int** coordinates = generate_coordinate_objects(5);
 
-  return false;
+  def_board = register_opponents_coordinate(coordinate, def_board, battleships, action, coordinates);
+
+  printf("AM: %d\n", coordinates_array_amount(coordinates));
+  int send_output = send_registerd_damage(socket_obj, action, coordinates);
+  if(send_output == false)
+  {
+  strcpy(game_result, "WON");
+    return false;
+  }
+  if(character_strings_equal(action, "DEFEATED\0", 8))
+  {
+    strcpy(game_result, "DEFEATED");
+    return false;
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 int receive_opponents_coordinate(int socket_obj, int* coordinate)
 {
+  //printf("receive_opponents_coordinate\n");
   int size = 200;
   char response[size];
   int recv_output = -1;
@@ -269,8 +271,6 @@ int receive_opponents_coordinate(int socket_obj, int* coordinate)
     return false;
   }
 
-  printf("RESP: (%s)\n", response);
-
   int length = character_string_length(response);
 
   int cord_output = convert_string_coordinate(response, length, coordinate);
@@ -279,23 +279,164 @@ int receive_opponents_coordinate(int socket_obj, int* coordinate)
   return true;
 }
 
-int send_registerd_protocol(int socket_obj, char* action, int** coordinates)
+int send_registerd_damage(int socket_obj, char* action, int** coordinates)
 {
-  //char* protocol = generate_damage_protocol(action, coordinates)
+  //printf("send_registerd_damage\n");
+  char* protocol = generate_character_string(200);
+  int gen_output = generate_damage_protocol(action, coordinates, protocol);
+  if(gen_output == false)
+  {
+    exit_and_print_message("WHEN GENERATING PROTOCOL");
+  }
+  printf("PROTOCOL: (%s)\n", protocol);
+
+  int send_output = send(socket_obj, protocol, 200, 0);
+  if(send_output == -1) return false;
+  return true;
+}
+
+int generate_damage_protocol(char* action, int** coordinates, char* protocol)
+{
+  //printf("generate_damage_protocol\n");
+  strcat(protocol, action); strcat(protocol, "=");
+  int amount = coordinates_array_amount(coordinates);
+  for(int index = 0; index < (amount - 1); index = index + 1)
+  {
+    int* coordinate = array_index_coordinate(coordinates, index);
+    int all_output = allocate_coordinate_protocol(coordinate, protocol);
+    if(all_output == false) return false;
+    strcat(protocol, "-");
+  }
+  int* coordinate = array_index_coordinate(coordinates, amount - 1);
+  int all_output = allocate_coordinate_protocol(coordinate, protocol);
+  if(all_output == false) return false;
+  return true;
+}
+
+int allocate_coordinate_protocol(int* coordinate, char* protocol)
+{
+  // printf("allocate_coordinate_protocol\n");
+  char* string = generate_character_string(200);
+  int conv_output = convert_coordinate_string(coordinate, string);
+
+  if(conv_output == false) return false;
+  strcat(protocol, string); return true;
 }
 
 char*** register_opponents_coordinate(int* coordinate, char*** def_board, int*** battleships, char* action, int** coordinates)
 {
+  // printf("register_opponents_coordinate\n");
+  strcpy(action, "MISS");
+  coordinates[0] = coordinate;
+  coordinates[1] = generate_coordinate_object(-1, -1);
 
+  for(int index = 0; index < 5; index = index + 1)
+  {
+    int** battleship = battleships_index_ship(battleships, index);
+    if(!coordinate_hit_battleship(coordinate, battleship))
+    {
+      continue;
+    }
+    strcpy(action, "HIT");
+
+    if(defence_ship_defeated(battleship, def_board, coordinate))
+    {
+      strcpy(action, "SUNKEN");
+      int** all_cords = every_battleship_coordinate(battleship);
+      int amount = coordinates_array_amount(all_cords);
+      for(int co_ind = 0; co_ind < amount; co_ind++)
+      {
+        coordinates[co_ind] = all_cords[co_ind];
+      }
+    }
+    break;
+  }
+  if(defence_board_defeated(def_board, battleships, coordinate))
+  {
+    strcpy(action, "DEFEATED");
+  }
+  def_board = set_coordinates_keyword(def_board, coordinates, action);
+  return def_board;
 }
+
+int defence_ship_defeated(int** battleship, char*** def_board, int* coordinate)
+{
+  int** all_cords = every_battleship_coordinate(battleship);
+  int amount = coordinates_array_amount(all_cords);
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    int* current = array_index_coordinate(battleship, index);
+    if(coordinate_objects_equal(current, coordinate))
+    {
+      continue;
+    }
+    char* keyword = board_coordinate_keyword(def_board, current);
+    if(strcmp(keyword, "HIT")) return false;
+  }
+  return true;
+}
+
+int defence_board_defeated(char*** def_board, int*** battleships, int* coordinate)
+{
+  for(int index = 0; index < 5; index = index + 1)
+  {
+    int** battleship = battleships_index_ship(battleships, index);
+    if(!defence_ship_defeated(battleship, def_board, coordinate))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+int coordinate_hit_battleship(int* coordinate, int** battleship)
+{
+  for(int index = 0; index < 2; index = index + 1)
+  {
+    int* current = array_index_coordinate(battleship, index);
+    if(coordinate_objects_equal(coordinate, current))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 int receive_opponents_protocol(int socket_obj, char* action, int** coordinates)
 {
+  // printf("receive_opponents_protocol\n");
+  char string[200];
+  int recv_output = -1;
 
+  while(recv_output == -1)
+  {
+    recv_output = recv(socket_obj, &string, 200, 0);
+  }
+  if(recv_output == 0) return false;
+
+  action = strtok(string, "=");
+  char* token = string;
+
+  int* coordinate = generate_coordinate_object(-1, -1);
+
+  for(int index = 0; token != NULL; index = index + 1)
+  {
+    printf("TOKEN: %s\n", token);
+    int length = character_string_length(token);
+    int conv_output = convert_string_coordinate(token, length, coordinate);
+    if(conv_output == false) return false;
+    coordinates = allocate_array_coordinate(coordinates, index, coordinate);
+
+    token = strtok(NULL, "-");
+  }
+
+  return true;
 }
 
 int send_attacking_coordinate(int socket_obj, int* coordinate)
 {
+  // printf("send_attacking_coordinate\n");
   int size = 200;
   char* string = generate_character_string(size);
 
@@ -303,15 +444,15 @@ int send_attacking_coordinate(int socket_obj, int* coordinate)
   if(conv_output == false) return false;
 
   int send_output = send(socket_obj, string, size, 0);
-
-  printf("SENT: (%s) SIZE: %d\n", string, size);
+  if(send_output == -1) return false;
 
   return true;
 }
 
 char*** register_protocol_coordinates(char* action, int** coordinates, char*** off_board)
 {
-
+  off_board = set_coordinates_keyword(off_board, coordinates, action);
+  return off_board;
 }
 //////////////////////////////////////////////////////////////////////////////////
 

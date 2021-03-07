@@ -41,9 +41,10 @@ char* character_string_section(char*, int, int);
 int markers_keyword_index(char[][2][200], int, char*);
 char*** generate_battleship_board(int, int);
 
-char*** board_coordinates_keyword(char***, int**, char*);
-char*** board_coordinate_keyword(char***, int*, char*);
+char*** set_coordinates_keyword(char***, int**, char*);
+char*** set_coordinate_keyword(char***, int*, char*);
 
 int convert_coordinate_string(int*, char*);
+char* board_coordinate_keyword(char***, int*);
 
 #endif

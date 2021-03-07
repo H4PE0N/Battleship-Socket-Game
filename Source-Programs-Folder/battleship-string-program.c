@@ -222,7 +222,7 @@ int markers_keyword_index(char markers[][2][200], int amount, char* keyword)
   return -1;
 }
 
-char*** board_coordinate_keyword(char*** board, int* coordinate, char* keyword)
+char*** set_coordinate_keyword(char*** board, int* coordinate, char* keyword)
 {
   int h_index = coordinate_index_value(coordinate, 0);
   int w_index = coordinate_index_value(coordinate, 1);
@@ -230,13 +230,13 @@ char*** board_coordinate_keyword(char*** board, int* coordinate, char* keyword)
   return board;
 }
 
-char*** board_coordinates_keyword(char*** board, int** coordinates, char* keyword)
+char*** set_coordinates_keyword(char*** board, int** coordinates, char* keyword)
 {
   int amount = coordinates_array_amount(coordinates);
   for(int index = 0; index < amount; index = index + 1)
   {
     int* coordinate = array_index_coordinate(coordinates, index);
-    board = board_coordinate_keyword(board, coordinate, keyword);
+    board = set_coordinate_keyword(board, coordinate, keyword);
   }
   return board;
 }
@@ -272,6 +272,13 @@ int convert_string_coordinates(char* string, int length, int** coordinates)
     coordinates = allocate_array_coordinate(coordinates, index, coordinates[index]);
   }
   return true;
+}
+
+char* board_coordinate_keyword(char*** board, int* coordinate)
+{
+  int h_index = coordinate_index_value(coordinate, 0);
+  int w_index = coordinate_index_value(coordinate, 1);
+  return board[h_index][w_index];
 }
 
 char alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', '\0'};
@@ -325,7 +332,7 @@ int convert_string_coordinate(char* string, int length, int* coordinate)
   if(index == -1) return false;
 
   coordinate[0] = index;
-  coordinate[1] = number;
+  coordinate[1] = (number - 1);
   return true;
 }
 
@@ -338,7 +345,7 @@ int convert_coordinate_string(int* coordinate, char* string)
   if(first < 0 || first >= length) return false;
 
   char letter = string_index_character(alphabet, first);
-  char number = (second + '0');
+  char number = (second + '1');
 
   string = allocate_string_character(string, 0, letter);
   string = allocate_string_character(string, 1, number);
