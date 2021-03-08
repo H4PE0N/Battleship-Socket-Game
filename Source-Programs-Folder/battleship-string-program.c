@@ -293,7 +293,7 @@ void display_board_width(char*** board, int width, int height)
   {
     char* keyword = board[height][index];
     int mark_index = markers_keyword_index(markers, 5, keyword);
-
+    //if(mark_index == -1); marker = ""; 
     char marker = markers[mark_index][1][0];
     printf("%c ", marker);
   }

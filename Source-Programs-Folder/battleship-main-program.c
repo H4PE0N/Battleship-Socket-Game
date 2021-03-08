@@ -5,12 +5,15 @@
 #include "battleship-socket-program.h"
 #include "battleship-ship-program.h"
 #include <errno.h>
+#include <time.h>
 
 #define BOARD_HEIGHT 10
 #define BOARD_WIDTH 10
 
 int main(int arg_amount, char* arguments[])
 {
+  srand(time(NULL));
+
   char* socket_role = extract_socket_role(arguments, arg_amount);
 
   if(character_string_length(socket_role) == 0)
@@ -61,17 +64,14 @@ int setup_socket_information(char* socket_role)
 
 int input_socket_information(char* address, int* port)
 {
-  // printf("ADDRESS\t:"); scanf("%s", address);
-  // printf("PORT\t: "); int port_valid=scanf("%d", port);
-  //
-  // int length = character_string_length(address);
-  // int addr_valid = socket_address_valid(address, length);
-  //
-  // if(addr_valid && port_valid) return true;
-  // exit_and_print_message("ADDRESS OR PORT NOT INPUTTED");
+  printf("ADDRESS\t:"); scanf("%s", address);
+  printf("PORT\t: "); int port_valid=scanf("%d", port);
 
-  strcpy(address, "192.168.1.113");
-  *port = 5555;
+  int length = character_string_length(address);
+  int addr_valid = socket_address_valid(address, length);
+
+  if(addr_valid && port_valid) return true;
+  exit_and_print_message("ADDRESS OR PORT NOT INPUTTED");
   return true;
 }
 
@@ -159,7 +159,6 @@ int*** input_battleship_position(int*** battleships, int index)
 
 char* server_battleship_game(int socket_obj, char*** def_board, char*** off_board, int*** battleships)
 {
-  printf("THE SERVER GAME START!\n");
   char* game_result = generate_character_string(200);
   while(!character_strings_equal(game_result, "WON\0", 3) && !character_strings_equal(game_result, "DEFEATED\0", 8))
   {
@@ -176,7 +175,6 @@ char* server_battleship_game(int socket_obj, char*** def_board, char*** off_boar
 
 char* client_battleship_game(int socket_obj, char*** def_board, char*** off_board, int*** battleships)
 {
-  printf("THE CLIENT GAME START!\n");
   char* game_result = generate_character_string(200);
   while(!character_strings_equal(game_result, "WON\0", 3) && !character_strings_equal(game_result, "DEFEATED\0", 8))
   {
@@ -237,7 +235,6 @@ int register_opponents_damage(int socket_obj, char*** def_board, int*** battlesh
 
   def_board = register_opponents_coordinate(coordinate, def_board, battleships, action, coordinates);
 
-  printf("AM: %d\n", coordinates_array_amount(coordinates));
   int send_output = send_registerd_damage(socket_obj, action, coordinates);
   if(send_output == false)
   {
@@ -288,7 +285,6 @@ int send_registerd_damage(int socket_obj, char* action, int** coordinates)
   {
     exit_and_print_message("WHEN GENERATING PROTOCOL");
   }
-  printf("PROTOCOL: (%s)\n", protocol);
 
   int send_output = send(socket_obj, protocol, 200, 0);
   if(send_output == -1) return false;
@@ -344,9 +340,10 @@ char*** register_opponents_coordinate(int* coordinate, char*** def_board, int***
       strcpy(action, "SUNKEN");
       int** all_cords = every_battleship_coordinate(battleship);
       int amount = coordinates_array_amount(all_cords);
-      for(int co_ind = 0; co_ind < amount; co_ind++)
+      for(int all_ind = 0; all_ind < amount; all_ind++)
       {
-        coordinates[co_ind] = all_cords[co_ind];
+        coordinates[all_ind][0] = all_cords[all_ind][0];
+        coordinates[all_ind][1] = all_cords[all_ind][1];
       }
     }
     break;
@@ -391,9 +388,11 @@ int defence_board_defeated(char*** def_board, int*** battleships, int* coordinat
 
 int coordinate_hit_battleship(int* coordinate, int** battleship)
 {
-  for(int index = 0; index < 2; index = index + 1)
+  int** all_cords = every_battleship_coordinate(battleship);
+  int amount = coordinates_array_amount(all_cords);
+  for(int index = 0; index < amount; index = index + 1)
   {
-    int* current = array_index_coordinate(battleship, index);
+    int* current = array_index_coordinate(all_cords, index);
     if(coordinate_objects_equal(coordinate, current))
     {
       return true;
@@ -415,18 +414,21 @@ int receive_opponents_protocol(int socket_obj, char* action, int** coordinates)
   }
   if(recv_output == 0) return false;
 
-  action = strtok(string, "=");
-  char* token = string;
+  strcpy(action, strtok(string, "="));
+  printf("ACTION: (%s)\n", action);
 
+  char* token = strtok(NULL, "-");
   int* coordinate = generate_coordinate_object(-1, -1);
 
   for(int index = 0; token != NULL; index = index + 1)
   {
-    printf("TOKEN: %s\n", token);
     int length = character_string_length(token);
+    printf("TOKEN: (%s)\n", token);
     int conv_output = convert_string_coordinate(token, length, coordinate);
+
     if(conv_output == false) return false;
-    coordinates = allocate_array_coordinate(coordinates, index, coordinate);
+    coordinates[index][0] = coordinate[0];
+    coordinates[index][1] = coordinate[1];
 
     token = strtok(NULL, "-");
   }
@@ -471,10 +473,18 @@ int* input_attacking_coordinate()
   }
 
   int* coordinate = generate_coordinate_object(-1, -1);
-  int cord_output = convert_string_coordinate(input_string, length, coordinate);
 
-  if(cord_output != false) return coordinate;
-  return input_attacking_coordinate();
+  if(character_strings_equal(input_string, "RANDOM", 6))
+  {
+
+  }
+  else if(!convert_string_coordinate(input_string, length, coordinate))
+  {
+    return input_attacking_coordinate();
+  }
+
+  return coordinate;
+
 }
 
 void display_game_result(char*** def_board, char*** off_board, char* game_result)
