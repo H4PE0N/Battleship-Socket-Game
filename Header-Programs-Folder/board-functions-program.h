@@ -1,0 +1,8 @@
+
+#ifndef BOARD_FUNCTIONS_PROGRAM_H
+#define BOARD_FUNCTIONS_PROGRAM_H
+
+#define BOARD_HEIGHT 10
+#define BOARD_WIDTH 10
+
+#endif

@@ -13,7 +13,8 @@ char* copy_character_string(char copying[], char* string, int length)
 
 int character_string_length(char string[])
 {
-  for(int length = 0; string[length] != '\0'; length++
+  int length;
+  for(length = 0; string[length] != '\0'; length += 1);
   return length;
 }
 
@@ -40,7 +41,7 @@ char* generate_character_string(int length)
   return string;
 }
 
-int character_strings_equal(char first[] char second[], int length)
+int character_strings_equal(char first[], char second[], int length)
 {
   for(int index = 0; index < length; index = index + 1)
   {
@@ -55,4 +56,30 @@ int character_strings_equal(char first[] char second[], int length)
 int character_values_equal(char first, char second)
 {
   int boolean = (first == second); return boolean;
+}
+
+char* convert_string_upper(char* string, int length)
+{
+  for(int index = 0; index < length; index = index + 1)
+  {
+    char character = string_index_character(string, index);
+    character = convert_character_upper(character);
+    string = allocate_string_character(string, index, character);
+  }
+  return string;
+}
+
+char convert_character_upper(char character)
+{
+  if(character_between_integers(character, 97, 122))
+  {
+    return (character - 32);
+  }
+  return character;
+}
+
+int character_between_integers(char character, int first, int second)
+{
+  int boolean = (character >= first && character <= second);
+  return boolean;
 }

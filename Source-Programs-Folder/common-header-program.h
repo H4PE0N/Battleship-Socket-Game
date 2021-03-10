@@ -4,7 +4,7 @@
 
 #include "../Header-Programs-Folder/battleship-main-program.h"
 
-//#include "../Header-Programs-Folder/socket-functions-program.h"
+#include "../Header-Programs-Folder/socket-functions-program.h"
 
 #include "../Header-Programs-Folder/string-functions-program.h"
 

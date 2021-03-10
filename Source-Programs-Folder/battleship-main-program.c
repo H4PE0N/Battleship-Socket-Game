@@ -6,18 +6,22 @@ int main(int arg_amount, char* arguments[])
   srand(time(NULL));
 
   char* sock_role = generate_character_string(STR_SIZE);
-  if(extract_socket_role(arguments, arg_amount, sock_role))
-  {
-    printf("SOCKET ROLE: %s\n", sock_role);
-  }
+  int sock_object = -1;
 
-  int sock_object = setup_socket_information(sock_role);
-  if(sock_object != -1) printf("SOCKET: %d\n");
+  char* def_board[BOARD_HEIGHT][BOARD_WIDTH];
+  char* off_board[BOARD_HEIGHT][BOARD_WIDTH];
+  int battleships[SHIP_AMOUNT][2][2];
+
+  int exct_output = extract_socket_role(arguments, arg_amount, sock_role);
+  if(exct_output == false) return false;
+
+  int setup_output = setup_socket_information(sock_role, &sock_object);
+  if(setup_output == false) return false;
+
+  int brds_output = generate_game_boards(def_board, off_board, BOARD_HEIGHT, BOARD_WIDTH);
+  int shps_output = generate_battleships_array(battleships, SHIP_AMOUNT);
 
   /*
-
-  setup socket
-
   generate def_board, off_board and battleships
 
   start game (either server game or client game)
