@@ -1,46 +1,49 @@
 
 #include "common-header-program.h"
 
-// int generate_battleship_array(int*** battleships, int amount, char*** def_board)
-// {
-//   battleships = malloc(sizeof(int**) * amount);
-//   for(int index = 0; index < amount; index = index + 1)
-//   {
-//     // display board
-//     int gnrt_output = generate_index_battleship(battleships, index);
-//     if(gnrt_output == false) return false;
-//     def_board = mark_battleship_position(def_board, battleship);
-//   }
-//   return true;
-// }
-//
-// int generate_index_battleship(int*** battleships, int index)
-// {
-//   *(battleships + index) = malloc(sizeof(int*) * 2);
-//   int** battleship = battleships_index_ship(battleships, index);
-//
-//   int inpt_output = input_battleship_position(battleships, index, battleship);
-//   if(inpt_output == false) return false;
-//
-//   battleships = allocate_battleships_ship(battleships, index, battleship);
-//   return true;
-// }
-//
-// int input_battleship_position(int*** battleships, int index, int** position)
-// {
-//   int ship_sizes[] = {2, 3, 3, 4, 5};
-//   int size = array_index_integer(ship_sizes, index);
-//
-//   char input_message[] = ("BATTLESHIP #%d [SIZE: %d]: ", index + 1, size);
-//   char* string = input_character_string(input_message);
-//
-//   if(character_strings_equal(string, "EXIT", 4))
-//     return false;
-//
-//   int conv_output = convert_string_position(position);
-//   if(conv_output == true) return true;
-//   return input_battleship_position(battleships, index, position);
-// }
+int generate_battleship_array(int*** battleships,
+  int amount, char*** def_board)
+{
+  battleships = malloc(sizeof(int**) * amount);
+  int height = BOARD_HEIGHT, width = BOARD_WIDTH;
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    display_battleship_board(def_board, height, width);
+    int gnrt_output=generate_index_battleship(battleships,
+      index); if(gnrt_output == false) return false;
+    def_board = mark_battleship_position(def_board,
+      battleship);
+  }
+  return true;
+}
+
+int generate_index_battleship(int*** battleships, int index)
+{
+  *(battleships + index) = malloc(sizeof(int*) * 2);
+  int** battleship = battleships_index_ship(battleships, index);
+
+  int inpt_output = input_battleship_position(battleships, index, battleship);
+  if(inpt_output == false) return false;
+
+  battleships = allocate_battleships_ship(battleships, index, battleship);
+  return true;
+}
+
+int input_battleship_position(int*** battleships, int index, int** position)
+{
+  int ship_sizes[] = {2, 3, 3, 4, 5};
+  int size = array_index_integer(ship_sizes, index);
+
+  char input_message[] = ("BATTLESHIP #%d [SIZE: %d]: ", index + 1, size);
+  char* string = input_character_string(input_message);
+
+  if(character_strings_equal(string, "EXIT", 4))
+    return false;
+
+  int conv_output = convert_string_position(position);
+  if(conv_output == true) return true;
+  return input_battleship_position(battleships, index, position);
+}
 //
 // int array_index_integer(int array[], int index)
 // {

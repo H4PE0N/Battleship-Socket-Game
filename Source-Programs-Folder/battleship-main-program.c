@@ -12,15 +12,16 @@ int main(int arg_amount, char* arguments[])
   // int sock_object = SOCK_NONE;
   // int setup_output = setup_socket_information(sock_role,
   //   &sock_object); if(!setup_output) return false;
+
   int height = BOARD_HEIGHT, width = BOARD_WIDTH;
   char*** def_board = generate_battleship_board(height,
     width);
   char*** off_board = generate_battleship_board(height,
     width);
 
-  // int*** battleships;
-  // int shps_output = allocate_battleship_array(battleships, SHIP_AMOUNT, def_board);
-  // if(shps_output == false) return false;
+  int*** battleships;
+  int shps_output = generate_battleship_array(battleships,
+    SHIP_AMOUNT, def_board);if(!shps_output)return false;
 
   // char* game_result = generate_character_string(STR_SIZE);
   // if(character_strings_equal(sock_role, "SERVER", 6))
