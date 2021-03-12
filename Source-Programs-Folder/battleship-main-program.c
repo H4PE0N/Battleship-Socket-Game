@@ -3,32 +3,37 @@
 
 int main(int arg_amount, char* arguments[])
 {
-  srand(time(NULL));
+  srand(time(NULL)); if(arg_amount < 2) return false;
 
-  char* sock_role = generate_character_string(STR_SIZE);
-  int sock_object = -1;
+  // char* sock_role = generate_character_string(STR_SIZE);
+  // int extr_output = extract_socket_role(arguments,
+  //   sock_role); if(extr_output == false) return false;
 
-  char* def_board[BOARD_HEIGHT][BOARD_WIDTH];
-  char* off_board[BOARD_HEIGHT][BOARD_WIDTH];
-  int battleships[SHIP_AMOUNT][2][2];
+  // int sock_object = SOCK_NONE;
+  // int setup_output = setup_socket_information(sock_role,
+  //   &sock_object); if(!setup_output) return false;
+  int height = BOARD_HEIGHT, width = BOARD_WIDTH;
+  char*** def_board = generate_battleship_board(height,
+    width);
+  char*** off_board = generate_battleship_board(height,
+    width);
 
-  int exct_output = extract_socket_role(arguments, arg_amount, sock_role);
-  if(exct_output == false) return false;
+  // int*** battleships;
+  // int shps_output = allocate_battleship_array(battleships, SHIP_AMOUNT, def_board);
+  // if(shps_output == false) return false;
 
-  int setup_output = setup_socket_information(sock_role, &sock_object);
-  if(setup_output == false) return false;
+  // char* game_result = generate_character_string(STR_SIZE);
+  // if(character_strings_equal(sock_role, "SERVER", 6))
+  // {
+  //   game_result = server_battleship_game(sock_object, def_board, off_board, battleships);
+  // }
+  // if(character_strings_equal(sock_role, "CLIENT", 6))
+  // {
+  //   game_result = client_battleship_game(sock_object, def_board, off_board, battleships);
+  // }
+  //
+  // display_game_result(def_board, off_board, game_result);
 
-  int brds_output = generate_game_boards(def_board, off_board, BOARD_HEIGHT, BOARD_WIDTH);
-  int shps_output = generate_battleships_array(battleships, SHIP_AMOUNT);
-
-  /*
-  generate def_board, off_board and battleships
-
-  start game (either server game or client game)
-
-  display game results
-
-  */
   return false;
 }
 

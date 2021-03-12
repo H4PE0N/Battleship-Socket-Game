@@ -8,9 +8,11 @@
 
 #include "../Header-Programs-Folder/string-functions-program.h"
 
-#include "../Header-Programs-Folder/input-functions-program.h"
-
 #include "../Header-Programs-Folder/output-functions-program.h"
+
+#include "../Header-Programs-Folder/board-functions-program.h"
+
+#include "../Header-Programs-Folder/battleship-functions-program.h"
 
 #include <stdbool.h>
 
@@ -22,6 +24,12 @@
 
 #include <string.h>
 
+#include <limits.h>
+
 #define STR_SIZE 200
+
+#define CHAR_NONE '\0'
+
+#define INT_NONE INT_MIN
 
 #endif
