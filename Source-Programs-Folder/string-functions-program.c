@@ -128,23 +128,53 @@ int string_inside_sentence(char string[], int length,
 int input_character_string(char input_message[],
   char* string)
 {
-  fflush(stdin); printf("%s", input_message);
-  char buffer[STR_SIZE]; fgets(buffer, STR_SIZE, stdin);
-  int inpt_output = sscanf(buffer, "%s", string);
+  fflush(stdin);
+  printf("%s", input_message);
+  char buffer[STR_SIZE];
+  fgets(buffer, STR_SIZE, stdin);
+  int inpt_output = sscanf(buffer, "%[^\n]", string);
   return (inpt_output == 1);
 }
 
 int input_integer_variable(char input_message[],
   int* integer)
 {
-  fflush(stdin); printf("%s", input_message);
-  char buffer[STR_SIZE]; fgets(buffer, STR_SIZE, stdin);
+  fflush(stdin);
+  printf("%s", input_message);
+  char buffer[STR_SIZE];
+  fgets(buffer, STR_SIZE, stdin);
   int inpt_output = sscanf(buffer, "%d", integer);
   return (inpt_output == 1);
 }
+
+
 
 char** allocate_sentence_string(char** sentence,
   int index, char string[])
 {
   *(sentence + index) = string; return sentence;
+}
+
+char** generate_string_sentence(int height, int width)
+{
+  char** sentence = malloc(sizeof(char*) * height);
+  for(int index = 0; index < height; index = index + 1)
+  {
+    char* string = generate_character_string(width);
+    sentence = allocate_sentence_string(sentence, index,
+      string);
+  }
+  return sentence;
+}
+
+int string_character_index(char string[], int length,
+  char character)
+{
+  for(int index = length; index >= 0; index = index - 1)
+  {
+    char current = string_index_character(string, index);
+    if(character_values_equal(current, character))
+      return index;
+  }
+  return INT_NONE;
 }

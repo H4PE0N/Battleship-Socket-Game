@@ -19,5 +19,7 @@ int string_inside_sentence(char[], int, char*[], int);
 int input_character_string(char[], char*);
 int input_integer_variable(char[], int*);
 char** allocate_sentence_string(char**, int, char[]);
+char** generate_string_sentence(int, int);
+int string_character_index(char[], int, char);
 
 #endif
