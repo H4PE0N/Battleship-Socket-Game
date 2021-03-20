@@ -14,6 +14,8 @@
 
 #include "../Header-Programs-Folder/battleship-functions-program.h"
 
+#include "../Header-Programs-Folder/integer-array-functions.h"
+
 #include <stdbool.h>
 
 #include <stdio.h>
