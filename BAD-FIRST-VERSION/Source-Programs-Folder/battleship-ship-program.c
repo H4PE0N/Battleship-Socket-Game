@@ -237,12 +237,6 @@ int coordinate_objects_equal(int* first, int* second)
   return true;
 }
 
-int generate_random_integer(int minimum, int maximum)
-{
-  int integer = (minimum + (rand() % (maximum - minimum + 1)) );
-  return integer;
-}
-
 int** generate_random_battleship(int*** battleships, int ship_size)
 {
   int** battleship = random_horizontal_battleship(ship_size);

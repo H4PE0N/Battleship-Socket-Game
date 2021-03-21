@@ -27,6 +27,8 @@ static char filename[] = "markers.txt";
 
 #include "../Header-Programs-Folder/character-string-functions.h"
 
+#include "../Header-Programs-Folder/battleship-input-design.h"
+
 #include <stdbool.h>
 
 #include <stdio.h>

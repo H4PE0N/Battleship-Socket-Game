@@ -6,36 +6,23 @@ void display_battleship_boards(char*** def_board,
 {
   char*** markers = extract_board_markers(filename,
     MARK_NUM);
+  printf("%s %s\n", board_line, board_line);
+  printf("%s %s\n", board_nums, board_nums);
   for(int index = 0; index < height; index = index + 1)
   {
-    display_board_sentence(def_board, width, index,
-      markers);
-    display_board_sentence(off_board, width, index,
-      markers);
-  }
-}
-
-void display_battleship_board(char*** board, int height,
-  int width)
-{
-  char*** markers = extract_board_markers(filename,
-    MARK_NUM);
-  printf("  ");
-  for(int number = 1; number <= width; number += 1)
-    printf("%d ", number); printf("\n");
-
-  for(int index = 0; index < height; index = index + 1)
-  {
-    display_board_sentence(board, width, index, markers);
+    display_board_sentence(def_board, width, index, markers);
+    printf(" ");
+    display_board_sentence(off_board, width, index, markers);
     printf("\n");
   }
+  printf("%s %s\n", board_line, board_line);
 }
 
 void display_board_sentence(char*** board, int width,
   int height, char*** markers)
 {
   char letter = alphabet_index_letter(alphabet, height);
-  printf("%c ", letter);
+  printf("| %c ", letter);
   for(int index = 0; index < width; index = index + 1)
   {
     char* keyword = board_index_keyword(board, height,
@@ -43,6 +30,7 @@ void display_board_sentence(char*** board, int width,
     char marker=markers_keyword_marker(markers, MARK_NUM,
       keyword); printf("%c ", marker);
   }
+  printf("|");
 }
 
 char alphabet_index_letter(char alphabet[], int index)

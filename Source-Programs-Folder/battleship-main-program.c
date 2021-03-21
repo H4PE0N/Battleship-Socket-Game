@@ -18,7 +18,7 @@ int main(int arg_amount, char* arguments[])
   char*** off_board = generate_battleship_board(height, width);
 
   int*** battleships = generate_integer_block(SHIP_AMOUNT, 2, 2);
-  int shps_output = generate_battleship_array(battleships, SHIP_AMOUNT, def_board);
+  int shps_output = generate_battleship_array(battleships, SHIP_AMOUNT, def_board, off_board);
   if(shps_output == false) return false;
 
   // char* game_result = generate_character_string(STR_SIZE);

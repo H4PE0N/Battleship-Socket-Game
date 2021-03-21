@@ -1,21 +1,23 @@
 
 #include "common-header-program.h"
 
-int generate_battleship_array(int*** battleships, int amount, char*** def_board)
+int generate_battleship_array(int*** battleships, int amount, char*** def_board, char*** off_board)
 {
-  int height = BOARD_HEIGHT, width = BOARD_WIDTH;
   for(int index = 0; index < amount; index = index + 1)
   {
-    display_battleship_board(def_board, height, width);
-    int gnrt_output = generate_index_battleship(battleships, index, def_board);
+    int gnrt_output = generate_index_battleship(battleships, index, def_board, off_board);
     if(gnrt_output == false) return false;
   }
   return true;
 }
 
-int generate_index_battleship(int*** battleships, int index, char*** def_board)
+int generate_index_battleship(int*** battleships, int index, char*** def_board, char*** off_board)
 {
   int** battleship = array_index_battleship(battleships, index);
+
+  int number = index + 1;
+  int size = array_index_integer(ship_sizes, index);
+  display_battleship_input(def_board, off_board, number, size);
 
   int inpt_output = input_battleship_position(battleships, index, battleship);
   if(inpt_output == false) return false;
@@ -30,7 +32,7 @@ int generate_index_battleship(int*** battleships, int index, char*** def_board)
 int input_battleship_position(int*** battleships, int index, int** battleship)
 {
   char* string = generate_character_string(STR_SIZE);
-  int inpt_output = input_string_battleship(index + 1, string);
+  int inpt_output = input_string_battleship(index, string);
   if(inpt_output == false) return false;
 
   int length = character_string_length(string);
@@ -39,26 +41,187 @@ int input_battleship_position(int*** battleships, int index, int** battleship)
 
   if(character_strings_equal(string, "RANDOM", length))
   {
-    battleship = generate_random_battleship(battleships, index + 1);
+    battleship = generate_random_battleship(battleships, index, battleship);
   }
-  else if(!convert_string_battleship(string, length, battleship))
+  else if(!generate_inputted_battleship(string, length, battleship))
   {
-    return input_battleship_position(battleships, index, battleship);;
+    return input_battleship_position(battleships, index, battleship);
   }
   return true;
 }
 
-int** generate_random_battleship(int*** battleships, int number)
+int generate_random_integer(int minimum, int maximum)
 {
-
+  int integer = (minimum + (rand() % (maximum - minimum + 1)) );
+  return integer;
 }
 
-int input_string_battleship(int number, char* string)
+int** generate_random_battleship(int*** battleships, int index, int** battleship)
 {
-  int size = array_index_integer(ship_sizes, number);
-  char* message = generate_character_string(STR_SIZE);
+  int size = array_index_integer(ship_sizes, index);
+  int** random_ship = random_vertical_battleship(size);
+  if(generate_random_integer(false, true) == true)
+  {
+    random_ship = random_vertical_battleship(size);
+  }
 
-  sprintf(message, "BATTLESHIP #%d [SIZE: %d]: ", number, size);
+  if(battleship_position_valid(random_ship, battleships))
+  {
+    battleship = copy_battleship_object(random_ship, battleship);
+    return battleship;
+  }
+  return generate_random_battleship(battleships, index, battleship);
+}
+
+int** copy_battleship_object(int** copying, int** battleship)
+{
+  for(int index = 0; index < 2; index = index + 1)
+  {
+    int* coordinate = array_index_coordinate(copying, index);
+    battleship = allocate_array_coordinate(battleship, index, coordinate);
+  }
+  return battleship;
+}
+
+int battleship_position_valid(int** battleship, int*** battleships)
+{
+  int amount = array_battleships_amount(battleships);
+  for(int index = 0; index < 5; index = index + 1) // CHANGE 5 TO AMOUNT
+  {
+    int** current = battleships_index_ship(battleships, index);
+
+    if(battleship_over_battleship(current, battleship))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+int** battleships_index_ship(int*** battleships, int index)
+{
+  int** battleship = block_index_matrix(battleships, index);
+  return battleship;
+}
+
+int battleship_over_battleship(int** first, int** second)
+{
+  int** f_cords = every_battleship_coordinate(first);
+  int** s_cords = every_battleship_coordinate(second);
+
+  int f_amount = array_coordinates_amount(f_cords);
+  int s_amount = array_coordinates_amount(s_cords);
+
+  for(int index = 0; index < f_amount; index = index + 1)
+  {
+    int* coordinate = array_index_coordinate(f_cords, index);
+
+    if(coordinate_inside_array(coordinate, s_cords, s_amount))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+int coordinate_inside_array(int* coordinate, int** coordinates, int amount)
+{
+  for(int index = 0; index < amount; index = index + 1)
+  {
+    int* current = array_index_coordinate(coordinates, index);
+    if(coordinate_objects_equal(coordinate, current))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+int coordinate_objects_equal(int* first, int* second)
+{
+  for(int index = 0; index < 2; index = index + 1)
+  {
+    int f_cord = coordinate_index_value(first, index);
+    int s_cord = coordinate_index_value(second, index);
+
+    if(!integer_variables_equal(f_cord, s_cord))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+int integer_variables_equal(int first, int second)
+{
+  int boolean = (first == second); return boolean;
+}
+
+int array_battleships_amount(int*** battleships)
+{
+  for(int amount = 0; true; amount = amount + 1)
+  {
+    int** battleship = array_index_battleship(battleships, amount);
+    if(!battleship_object_exists(battleship))
+    {
+      return amount;
+    }
+  }
+  return false;
+}
+
+int battleship_object_exists(int** battleship)
+{
+  int amount = array_coordinates_amount(battleship);
+  return (amount == 2);
+}
+
+int** random_vertical_battleship(int size)
+{
+  int range = (10 - size - 1);
+
+  int height = generate_random_integer(0, range);
+  int width = generate_random_integer(0, 10 - 1);
+
+  int* first = generate_coordinate_object(height, width);
+  int* second = generate_coordinate_object(height + size - 1, width);
+
+  return generate_battleship_object(first, second);
+}
+
+int** allocate_ship_coordinates(int** battleship, int* first, int* second)
+{
+  battleship = allocate_array_coordinate(battleship, 0, first);
+  battleship = allocate_array_coordinate(battleship, 1, second);
+  return battleship;
+}
+
+int** random_horizontal_battleship(int size)
+{
+  int range = (10 - size - 1);
+
+  int height = generate_random_integer(0, 10 - 1);
+  int width = generate_random_integer(0, range);
+
+  int* first = generate_coordinate_object(height, width);
+  int* second = generate_coordinate_object(height, width + size - 1);
+
+  return generate_battleship_object(first, second);
+}
+
+int** generate_battleship_object(int* first, int* second)
+{
+  int** battleship = generate_integer_matrix(2, 2);
+  battleship = allocate_array_coordinate(battleship, 0, first);
+  battleship = allocate_array_coordinate(battleship, 1, second);
+  return battleship;
+}
+
+int input_string_battleship(int index, char* string)
+{
+  int size = array_index_integer(ship_sizes, index);
+  char message[] = "[?] BATTLESHIP POSITION : ";
+
   int inpt_output = input_character_string(message, string);
   if(inpt_output == false) return false;
 
@@ -67,7 +230,49 @@ int input_string_battleship(int number, char* string)
   return true;
 }
 
-int convert_string_battleship(char string[], int length, int** battleship)
+int generate_inputted_battleship(char string[], int length, int** battleship)
+{
+  int** coordinates = generate_integer_matrix(2, 2);
+  int conv_output = convert_string_coordinates(string, length, coordinates);
+  if(conv_output == false) return false;
+
+  coordinates = switch_ship_coordinates(coordinates);
+
+}
+
+int** switch_ship_coordinates(int** battleship)
+{
+  int* first = array_index_coordinate(battleship, 0);
+  int* second = array_index_coordinate(battleship, 1);
+  if(battleship_order_valid(first, second))
+    return battleship;
+
+  int* temp_cord = duplicate_coordinate_object(first);
+  first = duplicate_coordinate_object(second);
+  second = duplicate_coordinate_object(temp_cord);
+
+  return battleship;
+}
+
+int* duplicate_coordinate_object(int* coordinate)
+{
+  int first = coordinate_index_value(coordinate, 0);
+  int second = coordinate_index_value(coordinate, 1);
+  return generate_coordinate_object(first, second);
+}
+
+int battleship_order_valid(int* first, int* second)
+{
+  for(int index = 0; index < 2; index = index + 1)
+  {
+    int first_int = coordinate_index_value(first, index);
+    int second_int = coordinate_index_value(second, index);
+    if(first_int > second_int) return false;
+  }
+  return true;
+}
+
+int convert_string_coordinates(char string[], int length, int** coordinates)
 {
   char** sentence = generate_character_sentence(2, STR_SIZE);
   int prse_output = parse_inputted_battleship(string, length, sentence);
@@ -78,11 +283,10 @@ int convert_string_battleship(char string[], int length, int** battleship)
     char* current = sentence_index_string(sentence, index);
     int curr_length = character_string_length(current);
 
-    int* coordinate = array_index_coordinate(battleship, index);
+    int* coordinate = array_index_coordinate(coordinates, index);
 
     int conv_output = convert_string_coordinate(current, curr_length, coordinate);
     if(conv_output == false) return false;
-    battleship = allocate_array_coordinate(battleship, index, coordinate); // This is not needed!
   }
   return true;
 }
@@ -93,11 +297,7 @@ int parse_inputted_battleship(char string[], int length, char** sentence)
   char* second = sentence_index_string(sentence, 1);
 
   int prse_output = sscanf(string, "%s %s", first, second);
-  if(prse_output == false) return false;
-
-  sentence = allocate_sentence_string(sentence, 0, first); // This is not needed!
-  sentence = allocate_sentence_string(sentence, 1, second); // This is not needed!
-  return true;
+  return (prse_output == 2);
 }
 
 int convert_string_coordinate(char string[], int length, int* coordinate)
