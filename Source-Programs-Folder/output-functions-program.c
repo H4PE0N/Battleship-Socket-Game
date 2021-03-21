@@ -1,11 +1,6 @@
 
 #include "common-header-program.h"
 
-char alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
-  'H', 'J', 'I', CHAR_NONE};
-
-char filename[] = "markers.txt";
-
 void display_battleship_boards(char*** def_board,
   char*** off_board, int height, int width)
 {

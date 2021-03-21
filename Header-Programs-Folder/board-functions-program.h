@@ -6,9 +6,9 @@
 #define BOARD_WIDTH 10
 
 char*** generate_battleship_board(int, int);
-char*** allocate_board_keyword(char***, int, int, char[]);
 char*** generate_index_sentence(char***, int, int);
-char** board_index_sentence(char***, int);
+
+char*** allocate_board_keyword(char***, int, int, char[]);
 char* board_index_keyword(char***, int, int);
 
 #endif

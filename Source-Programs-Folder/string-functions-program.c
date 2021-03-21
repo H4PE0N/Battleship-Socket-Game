@@ -1,28 +1,6 @@
 
 #include "common-header-program.h"
 
-char* generate_character_string(int length)
-{
-  char* string = malloc(sizeof(char) * length);
-  for(int index = 0; index < length; index = index + 1)
-  {
-    string = allocate_string_character(string, index,
-      CHAR_NONE);
-  }
-  return string;
-}
-
-char* allocate_string_character(char* string,int index,
-  char character)
-{
-  *(string + index) = character; return string;
-}
-
-char* sentence_index_string(char** sentence, int index)
-{
-  char* string = *(sentence + index); return string;
-}
-
 char* convert_string_upper(char* string, int length)
 {
   for(int index = 0; index < length; index = index + 1)
@@ -59,11 +37,6 @@ int character_smaller_than(char character, int integer)
 int character_greater_than(char character, int integer)
 {
   int boolean = (character > integer); return boolean;
-}
-
-char string_index_character(char string[], int index)
-{
-  char character = *(string + index); return character;
 }
 
 int character_string_length(char string[])
@@ -145,26 +118,6 @@ int input_integer_variable(char input_message[],
   fgets(buffer, STR_SIZE, stdin);
   int inpt_output = sscanf(buffer, "%d", integer);
   return (inpt_output == 1);
-}
-
-
-
-char** allocate_sentence_string(char** sentence,
-  int index, char string[])
-{
-  *(sentence + index) = string; return sentence;
-}
-
-char** generate_string_sentence(int height, int width)
-{
-  char** sentence = malloc(sizeof(char*) * height);
-  for(int index = 0; index < height; index = index + 1)
-  {
-    char* string = generate_character_string(width);
-    sentence = allocate_sentence_string(sentence, index,
-      string);
-  }
-  return sentence;
 }
 
 int string_character_index(char string[], int length,

@@ -28,7 +28,7 @@ char*** generate_character_paper(int amount, int height, int width)
   for(int index = 0; index < amount; index = index + 1)
   {
     char** sentence = generate_character_sentence(height, width);
-    paper = allocate_paper_sentence(paper, index);
+    paper = allocate_paper_sentence(paper, index, sentence);
   }
   return paper;
 }
@@ -80,7 +80,7 @@ char* sentence_index_string(char** sentence, int index)
 
 char* paper_index_string(char*** paper, int index, int height)
 {
-  char** sentence = paper_index_string(paper, index);
+  char** sentence = paper_index_sentence(paper, index);
   char* string = sentence_index_string(sentence, height);
   return string;
 }

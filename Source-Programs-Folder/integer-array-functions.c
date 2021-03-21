@@ -3,8 +3,8 @@
 
 int* generate_integer_array(int length)
 {
-  int* array = malloc(sizeof(int) * length);
-  for(int index = 0; index < length; index = index + 1)
+  int* array = malloc(sizeof(int) * (length + 1));
+  for(int index = 0; index < (length + 1); index = index + 1)
   {
     array = allocate_array_integer(array, index, INT_NONE);
   }
@@ -13,8 +13,8 @@ int* generate_integer_array(int length)
 
 int** generate_integer_matrix(int height, int width)
 {
-  int** matrix = malloc(sizeof(int*) * height);
-  for(int index = 0; index < height; index = index + 1)
+  int** matrix = malloc(sizeof(int*) * (height + 1));
+  for(int index = 0; index < (height + 1); index = index + 1)
   {
     int* array = generate_integer_array(width);
     matrix = allocate_matrix_array(matrix, index, array);
@@ -24,8 +24,8 @@ int** generate_integer_matrix(int height, int width)
 
 int*** generate_integer_block(int amount, int height, int width)
 {
-  int*** block = malloc(sizeof(int**) * amount);
-  for(int index = 0; index < amount; index = index + 1)
+  int*** block = malloc(sizeof(int**) * (amount + 1));
+  for(int index = 0; index < (amount + 1); index = index + 1)
   {
     int** matrix = generate_integer_matrix(height, width);
     block = allocate_block_matrix(block, index, matrix);
@@ -97,7 +97,7 @@ int** allocate_matrix_array(int** matrix, int index, int* array)
 
 int*** allocate_block_array(int*** block, int index, int height, int* array)
 {
-  int** matrix = block_index_array(block, index);
+  int** matrix = block_index_matrix(block, index);
   matrix = allocate_matrix_array(matrix, height, array);
   block = allocate_block_matrix(block, index, matrix); // This is not needed!
   return block;
